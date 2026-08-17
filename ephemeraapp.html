@@ -1,0 +1,2803 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Ephemera AI Studio</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --brown: #6f4e37;
+      --brown-dark: #563a29;
+      --brown-light: #8a6a4f;
+      --cream: #efe9df;
+      --cream-light: #faf7f2;
+      --white: #ffffff;
+      --border: #ded7d0;
+      --text: #333333;
+      --muted: #777777;
+      --orange: #b66a3c;
+      --green: #5f7654;
+      --gray: #777777;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--cream);
+      color: var(--text);
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    header {
+      background: var(--brown);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 28px;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* =========================
+       LAYOUT
+    ========================= */
+
+    .container {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      min-height: calc(100vh - 75px);
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .sidebar {
+      background: white;
+      padding: 22px;
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      color: var(--brown);
+      font-size: 21px;
+    }
+
+    .sidebar-section {
+      margin-bottom: 24px;
+    }
+
+    .sidebar-section-title {
+      margin-top: 25px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #eee;
+      color: var(--brown);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    /* =========================
+       FORM
+    ========================= */
+
+    label {
+      display: block;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #cccccc;
+      background: white;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    select,
+    input {
+      border-radius: 8px;
+      padding: 10px 11px;
+    }
+
+    textarea {
+      border-radius: 10px;
+      padding: 14px;
+      resize: vertical;
+      line-height: 1.55;
+      font-family: Consolas, Monaco, monospace;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--brown);
+      box-shadow: 0 0 0 2px rgba(111, 78, 55, 0.08);
+    }
+
+    /* =========================
+       BUTTONS
+    ========================= */
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 9px;
+      padding: 12px;
+      margin-top: 10px;
+      background: var(--brown);
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--brown-dark);
+      transform: translateY(-1px);
+    }
+
+    .button-orange {
+      background: var(--orange);
+    }
+
+    .button-orange:hover {
+      background: #9e5834;
+    }
+
+    .button-light {
+      background: var(--brown-light);
+    }
+
+    .button-light:hover {
+      background: #73543e;
+    }
+
+    .button-gray {
+      background: var(--gray);
+    }
+
+    .button-gray:hover {
+      background: #626262;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .button-grid button {
+      margin-top: 0;
+    }
+
+    /* =========================
+       TOTAL
+    ========================= */
+
+    .total-box {
+      margin-top: 18px;
+      padding: 13px;
+      background: var(--cream);
+      border-radius: 9px;
+      color: var(--brown);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .status {
+      min-height: 22px;
+      margin-top: 12px;
+      text-align: center;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    .main {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* =========================
+       PREVIEW
+    ========================= */
+
+    .preview {
+      min-height: 250px;
+      background: white;
+      border: 2px dashed #cccccc;
+      border-radius: 14px;
+      padding: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: var(--muted);
+      font-size: 22px;
+    }
+
+    .preview.ready {
+      border-style: solid;
+      border-color: #d6c6b8;
+      color: var(--brown);
+      background:
+        linear-gradient(
+          rgba(255, 255, 255, 0.94),
+          rgba(255, 255, 255, 0.94)
+        ),
+        repeating-linear-gradient(
+          45deg,
+          #efe9df,
+          #efe9df 10px,
+          #f8f3ed 10px,
+          #f8f3ed 20px
+        );
+    }
+
+    .preview-title {
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .preview-small {
+      margin-top: 12px;
+      font-size: 16px;
+      color: #666;
+      line-height: 1.7;
+    }
+
+    /* =========================
+       CARDS
+    ========================= */
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h2,
+    .card h3 {
+      margin-top: 0;
+      color: var(--brown);
+    }
+
+    .card h2 {
+      font-size: 22px;
+    }
+
+    .card-description {
+      margin-top: -5px;
+      margin-bottom: 18px;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    .main-prompt {
+      min-height: 420px;
+    }
+
+    /* =========================
+       ETSY GRID
+    ========================= */
+
+    .etsy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .etsy-card {
+      background: var(--cream-light);
+      border: 1px solid #e5ddd5;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .etsy-card h3 {
+      font-size: 17px;
+      margin-bottom: 10px;
+    }
+
+    .etsy-card textarea {
+      min-height: 260px;
+      background: white;
+    }
+
+    .etsy-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .etsy-card.full textarea {
+      min-height: 320px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 1000px) {
+      .etsy-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .etsy-card.full {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .main {
+        padding: 15px;
+      }
+
+      header {
+        font-size: 23px;
+      }
+
+      .button-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       HEADER
+  ========================== -->
+
+  <header>
+    🌸 Ephemera AI Studio
+  </header>
+
+
+  <div class="container">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar">
+
+      <h2>🎨 Product Settings</h2>
+
+
+      <div class="sidebar-section">
+
+        <div class="sidebar-section-title">
+          Design
+        </div>
+
+
+        <label for="era">
+          Era
+        </label>
+
+        <select id="era">
+          <option>Victorian</option>
+          <option>Edwardian</option>
+          <option>Art Nouveau</option>
+          <option>Art Deco</option>
+          <option>Vintage 1900s</option>
+          <option>1920s</option>
+          <option>1930s</option>
+          <option>1940s</option>
+          <option>1950s</option>
+          <option>1960s</option>
+          <option>1970s</option>
+          <option>Early 20th Century</option>
+          <option>European Antique</option>
+          <option>French Vintage</option>
+          <option>English Country Vintage</option>
+        </select>
+
+
+        <label for="theme">
+          Theme
+        </label>
+
+        <select id="theme">
+          <option>Flowers</option>
+          <option>Flowers & Butterflies</option>
+          <option>Butterflies</option>
+          <option>Mushrooms</option>
+          <option>Birds</option>
+          <option>Garden</option>
+          <option>Botanical</option>
+          <option>Wildflowers</option>
+          <option>Roses</option>
+          <option>Lavender</option>
+          <option>Sunflowers</option>
+          <option>Peonies</option>
+          <option>Herbs & Botanical Plants</option>
+          <option>Ferns</option>
+          <option>Forest</option>
+          <option>Woodland</option>
+          <option>Garden Birds</option>
+          <option>Songbirds</option>
+          <option>Bees & Insects</option>
+          <option>Dragonflies</option>
+          <option>Butterfly Garden</option>
+          <option>Birds & Flowers</option>
+          <option>Birds & Botanicals</option>
+          <option>Vintage Garden</option>
+          <option>Tea Party</option>
+          <option>Tea & Roses</option>
+          <option>Parisian Garden</option>
+          <option>French Botanicals</option>
+          <option>English Garden</option>
+          <option>Country Cottage</option>
+          <option>Wild Garden</option>
+          <option>Nature Journal</option>
+          <option>Antique Botanical Collection</option>
+          <option>Vintage Labels & Tickets</option>
+          <option>Postage & Stamps</option>
+          <option>Letters & Correspondence</option>
+          <option>Books & Library</option>
+          <option>Music & Sheet Music</option>
+          <option>Travel & Maps</option>
+          <option>Paris & France</option>
+          <option>Romantic Vintage</option>
+          <option>Christmas Vintage</option>
+          <option>Autumn Nature</option>
+          <option>Winter Botanicals</option>
+          <option>Spring Garden</option>
+          <option>Summer Garden</option>
+        </select>
+
+
+        <label for="elementType">
+          Element Type
+        </label>
+
+        <select id="elementType">
+          <option>Mixed Ephemera</option>
+          <option>Labels</option>
+          <option>Tags</option>
+          <option>Tickets</option>
+          <option>Journal Cards</option>
+          <option>Postcards</option>
+          <option>Frames</option>
+          <option>Mini Cards</option>
+          <option>Specimen Cards</option>
+          <option>Botanical Cards</option>
+          <option>Stamps</option>
+          <option>Bookplates</option>
+          <option>Paper Scraps</option>
+          <option>Decorative Cutouts</option>
+          <option>Mixed Shapes</option>
+        </select>
+
+
+        <label for="style">
+          Style
+        </label>
+
+        <select id="style">
+          <option>Watercolor</option>
+          <option>Vintage Illustration</option>
+          <option>Oil Painting</option>
+          <option>Botanical Illustration</option>
+          <option>Hand Painted</option>
+          <option>Antique Engraving</option>
+          <option>Scientific Botanical Illustration</option>
+          <option>French Antique Illustration</option>
+          <option>Victorian Illustration</option>
+          <option>Edwardian Illustration</option>
+          <option>Etching</option>
+          <option>Lithograph</option>
+          <option>Collage</option>
+          <option>Mixed Media</option>
+          <option>Hand Drawn</option>
+          <option>Ink Illustration</option>
+          <option>Colored Pencil</option>
+          <option>Gouache</option>
+          <option>Vintage Print</option>
+          <option>Antique Book Illustration</option>
+        </select>
+
+
+        <label for="palette">
+          Palette
+        </label>
+
+        <select id="palette">
+          <option>Pastel</option>
+          <option>Sepia</option>
+          <option>Earth Tones</option>
+          <option>Neutral</option>
+          <option>Muted Vintage</option>
+          <option>Dusty Rose</option>
+          <option>Dusty Blue</option>
+          <option>Dusty Green</option>
+          <option>Sage Green</option>
+          <option>Olive Green</option>
+          <option>Antique Cream</option>
+          <option>Warm Beige</option>
+          <option>Brown & Cream</option>
+          <option>Rose & Beige</option>
+          <option>Blue & Cream</option>
+          <option>Green & Cream</option>
+          <option>Terracotta</option>
+          <option>Autumn Colors</option>
+          <option>Soft Romantic</option>
+          <option>Faded Antique Colors</option>
+        </select>
+
+
+        <label for="paper">
+          Paper
+        </label>
+
+        <select id="paper">
+          <option>Antique Paper</option>
+          <option>Old Book</option>
+          <option>Cream Paper</option>
+          <option>Aged Paper</option>
+          <option>Vintage Parchment</option>
+          <option>Tea Stained Paper</option>
+          <option>Distressed Paper</option>
+          <option>Old Ledger Paper</option>
+          <option>Antique Notebook Paper</option>
+          <option>Vintage Journal Paper</option>
+          <option>Old Dictionary Page</option>
+          <option>Old Encyclopedia Page</option>
+          <option>Handmade Paper</option>
+          <option>Textured Antique Paper</option>
+          <option>Faded Paper</option>
+        </select>
+
+      </div>
+
+
+      <div class="sidebar-section">
+
+        <div class="sidebar-section-title">
+          Printable Settings
+        </div>
+
+
+        <label for="page">
+          Page Size
+        </label>
+
+        <select id="page">
+          <option>A4</option>
+          <option>A5</option>
+          <option>Letter</option>
+        </select>
+
+
+        <label for="orientation">
+          Orientation
+        </label>
+
+        <select id="orientation">
+          <option>Portrait</option>
+          <option>Landscape</option>
+        </select>
+
+
+        <label for="pages">
+          Number of Pages
+        </label>
+
+        <input
+          id="pages"
+          type="number"
+          min="1"
+          max="50"
+          value="4"
+        />
+
+
+        <label for="elements">
+          Elements per Page
+        </label>
+
+        <input
+          id="elements"
+          type="number"
+          min="1"
+          max="30"
+          value="8"
+        />
+
+
+        <label for="output">
+          Output Format
+        </label>
+
+        <select id="output">
+          <option>PNG</option>
+          <option>PDF</option>
+          <option>JPG</option>
+        </select>
+
+
+        <div class="total-box">
+          Total Elements:
+          <span id="totalElements">32</span>
+        </div>
+
+      </div>
+
+
+      <div class="sidebar-section">
+
+        <div class="sidebar-section-title">
+          Generate
+        </div>
+
+
+        <button id="generateProductButton">
+          ✨ Generate Product Prompt
+        </button>
+
+
+        <button
+          id="generateEtsyButton"
+          class="button-orange"
+        >
+          🛍️ Generate Complete Etsy Kit
+        </button>
+
+
+        <div class="button-grid">
+
+          <button
+            id="randomButton"
+            class="button-light"
+          >
+            🎲 Randomize
+          </button>
+
+          <button
+            id="resetButton"
+            class="button-gray"
+          >
+            ↺ Reset
+          </button>
+
+        </div>
+
+
+        <div
+          class="status"
+          id="status"
+        ></div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="main">
+
+
+      <!-- PREVIEW -->
+
+      <div
+        class="preview"
+        id="preview"
+      >
+        <div>
+          🖼️
+          <br /><br />
+          Your Product Preview
+        </div>
+      </div>
+
+
+      <!-- PRODUCT PROMPT -->
+
+      <section class="card">
+
+        <h2>
+          🎨 Product Generation Prompt
+        </h2>
+
+        <p class="card-description">
+          Use this prompt to generate the printable ephemera collection itself.
+        </p>
+
+        <textarea
+          id="productPrompt"
+          class="main-prompt"
+          placeholder="Your product generation prompt will appear here..."
+        ></textarea>
+
+        <button
+          class="button-light"
+          data-copy="productPrompt"
+        >
+          📋 Copy Product Prompt
+        </button>
+
+      </section>
+
+
+      <!-- ETSY -->
+
+      <section class="card">
+
+        <h2>
+          🛍️ Etsy Listing Studio
+        </h2>
+
+        <p class="card-description">
+          Generate coordinated prompts for your Etsy thumbnail, listing images,
+          title, description, tags, alt text and SEO.
+        </p>
+
+
+        <div class="etsy-grid">
+
+
+          <!-- IMAGE 1 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              ⭐ 1. Main Thumbnail
+            </h3>
+
+            <textarea
+              id="etsyImage1"
+              placeholder="Main Etsy thumbnail prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage1">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 2 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              📦 2. What's Included
+            </h3>
+
+            <textarea
+              id="etsyImage2"
+              placeholder="What's included image prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage2">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 3 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              🔎 3. Close-Up Details
+            </h3>
+
+            <textarea
+              id="etsyImage3"
+              placeholder="Close-up details prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage3">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 4 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              ✂️ 4. Cut-Out Preview
+            </h3>
+
+            <textarea
+              id="etsyImage4"
+              placeholder="Cut-out preview prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage4">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 5 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              📖 5. Junk Journal Mockup
+            </h3>
+
+            <textarea
+              id="etsyImage5"
+              placeholder="Junk journal mockup prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage5">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 6 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              🎨 6. Scrapbook / Collage
+            </h3>
+
+            <textarea
+              id="etsyImage6"
+              placeholder="Scrapbook and collage prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage6">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 7 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              📄 7. Printable Pages
+            </h3>
+
+            <textarea
+              id="etsyImage7"
+              placeholder="Printable pages preview prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage7">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 8 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              ⬇️ 8. Download · Print · Cut · Create
+            </h3>
+
+            <textarea
+              id="etsyImage8"
+              placeholder="How it works image prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage8">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 9 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              💾 9. Digital Download Info
+            </h3>
+
+            <textarea
+              id="etsyImage9"
+              placeholder="Digital download information prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage9">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- IMAGE 10 -->
+
+          <div class="etsy-card">
+
+            <h3>
+              🌸 10. Beauty Shot
+            </h3>
+
+            <textarea
+              id="etsyImage10"
+              placeholder="Final beauty shot prompt..."
+            ></textarea>
+
+            <button data-copy="etsyImage10">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- TITLE -->
+
+          <div class="etsy-card full">
+
+            <h3>
+              🏷️ Etsy Title Generator Prompt
+            </h3>
+
+            <textarea
+              id="titlePrompt"
+              placeholder="Etsy title generator prompt..."
+            ></textarea>
+
+            <button data-copy="titlePrompt">
+              📋 Copy Title Prompt
+            </button>
+
+          </div>
+
+
+          <!-- DESCRIPTION -->
+
+          <div class="etsy-card full">
+
+            <h3>
+              📝 Etsy Description Generator Prompt
+            </h3>
+
+            <textarea
+              id="descriptionPrompt"
+              placeholder="Etsy description generator prompt..."
+            ></textarea>
+
+            <button data-copy="descriptionPrompt">
+              📋 Copy Description Prompt
+            </button>
+
+          </div>
+
+
+          <!-- TAGS -->
+
+          <div class="etsy-card">
+
+            <h3>
+              🔍 Etsy Tags Prompt
+            </h3>
+
+            <textarea
+              id="tagsPrompt"
+              placeholder="Etsy tags generator prompt..."
+            ></textarea>
+
+            <button data-copy="tagsPrompt">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- ALT -->
+
+          <div class="etsy-card">
+
+            <h3>
+              🖼️ Image Alt Text Prompt
+            </h3>
+
+            <textarea
+              id="altPrompt"
+              placeholder="Image alt-text generator prompt..."
+            ></textarea>
+
+            <button data-copy="altPrompt">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- MATERIALS -->
+
+          <div class="etsy-card">
+
+            <h3>
+              📋 Materials Prompt
+            </h3>
+
+            <textarea
+              id="materialsPrompt"
+              placeholder="Etsy materials prompt..."
+            ></textarea>
+
+            <button data-copy="materialsPrompt">
+              📋 Copy
+            </button>
+
+          </div>
+
+
+          <!-- SEO -->
+
+          <div class="etsy-card">
+
+            <h3>
+              📈 Etsy SEO Prompt
+            </h3>
+
+            <textarea
+              id="seoPrompt"
+              placeholder="Etsy SEO strategy prompt..."
+            ></textarea>
+
+            <button data-copy="seoPrompt">
+              📋 Copy
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- =========================
+       JAVASCRIPT
+  ========================== -->
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      /* =========================
+         HELPERS
+      ========================= */
+
+      function getElement(id) {
+        return document.getElementById(id);
+      }
+
+
+      function getValue(id, fallback = "") {
+
+        const element = getElement(id);
+
+        if (!element) {
+          return fallback;
+        }
+
+        return element.value || fallback;
+      }
+
+
+      function getSettings() {
+
+        return {
+
+          era:
+            getValue("era", "Victorian"),
+
+          theme:
+            getValue("theme", "Flowers"),
+
+          elementType:
+            getValue("elementType", "Mixed Ephemera"),
+
+          style:
+            getValue("style", "Watercolor"),
+
+          palette:
+            getValue("palette", "Pastel"),
+
+          paper:
+            getValue("paper", "Antique Paper"),
+
+          page:
+            getValue("page", "A4"),
+
+          orientation:
+            getValue("orientation", "Portrait"),
+
+          pages:
+            Math.max(
+              1,
+              parseInt(getValue("pages", "4"), 10) || 4
+            ),
+
+          elements:
+            Math.max(
+              1,
+              parseInt(getValue("elements", "8"), 10) || 8
+            ),
+
+          output:
+            getValue("output", "PNG")
+
+        };
+      }
+
+
+      /* =========================
+         STATUS
+      ========================= */
+
+      let statusTimer = null;
+
+
+      function showStatus(message) {
+
+        const status =
+          getElement("status");
+
+        if (!status) {
+          return;
+        }
+
+        status.textContent =
+          message;
+
+        if (statusTimer) {
+          clearTimeout(statusTimer);
+        }
+
+        statusTimer =
+          setTimeout(function () {
+
+            status.textContent = "";
+
+          }, 2500);
+      }
+
+
+      /* =========================
+         TOTAL
+      ========================= */
+
+      function updateTotal() {
+
+        const settings =
+          getSettings();
+
+        const total =
+          settings.pages *
+          settings.elements;
+
+        const totalElement =
+          getElement("totalElements");
+
+        if (totalElement) {
+
+          totalElement.textContent =
+            total;
+        }
+      }
+
+
+      /* =========================
+         PREVIEW
+      ========================= */
+
+      function updatePreview() {
+
+        const settings =
+          getSettings();
+
+        const total =
+          settings.pages *
+          settings.elements;
+
+        const preview =
+          getElement("preview");
+
+        if (!preview) {
+          return;
+        }
+
+        preview.classList.add("ready");
+
+        preview.innerHTML = `
+          <div>
+
+            <div class="preview-title">
+              🌸 ${settings.theme}
+            </div>
+
+            <div class="preview-small">
+
+              ${settings.era}
+              ·
+              ${settings.style}
+
+              <br />
+
+              ${settings.palette}
+              ·
+              ${settings.paper}
+
+              <br /><br />
+
+              ${settings.elementType}
+
+              <br />
+
+              ${settings.pages}
+              Page(s)
+              ·
+              ${settings.elements}
+              Elements / Page
+
+              <br />
+
+              ${total}
+              Total Elements
+
+              <br /><br />
+
+              ${settings.page}
+              ·
+              ${settings.orientation}
+              ·
+              ${settings.output}
+
+            </div>
+
+          </div>
+        `;
+      }
+
+
+      /* =========================
+         PRODUCT PROMPT
+      ========================= */
+
+      function generateProductPrompt() {
+
+        const s =
+          getSettings();
+
+        const total =
+          s.pages * s.elements;
+
+
+        const prompt = `
+Create a premium printable vintage ephemera collection.
+
+PROJECT
+
+THEME:
+${s.theme}
+
+ERA:
+${s.era}
+
+ELEMENT TYPE:
+${s.elementType}
+
+ART STYLE:
+${s.style}
+
+COLOR PALETTE:
+${s.palette}
+
+PAPER STYLE:
+${s.paper}
+
+PAGE SIZE:
+${s.page}
+
+ORIENTATION:
+${s.orientation}
+
+NUMBER OF PAGES:
+${s.pages}
+
+TARGET ELEMENTS PER PAGE:
+${s.elements}
+
+APPROXIMATE TOTAL ELEMENTS:
+${total}
+
+OUTPUT FORMAT:
+${s.output}
+
+
+PURPOSE
+
+Create a beautiful and professionally coordinated vintage ephemera collection suitable for:
+
+junk journals,
+scrapbooking,
+art journals,
+collage,
+paper crafts,
+creative journaling,
+and printable craft projects.
+
+
+LAYOUT REQUIREMENTS
+
+Each page should contain approximately ${s.elements} separate and individually cuttable elements.
+
+Leave generous clear space between every element.
+
+Do not allow individual pieces to touch or overlap.
+
+Use different element shapes, proportions and sizes while maintaining an elegant and balanced page composition.
+
+Use the printable page efficiently without overcrowding it.
+
+Keep important artwork away from the outer page edges.
+
+
+VISUAL DIRECTION
+
+Maintain a consistent ${s.theme} theme throughout the complete collection.
+
+Use ${s.style} artwork inspired by the ${s.era} period.
+
+Use a cohesive ${s.palette} color palette.
+
+Apply realistic ${s.paper} paper textures.
+
+Include subtle vintage characteristics such as:
+
+aged ink,
+faded pigments,
+natural paper fibers,
+minor discoloration,
+historical print texture,
+delicate distressed details,
+authentic antique illustration characteristics.
+
+
+DESIGN VARIETY
+
+Create meaningful visual variety across all pages.
+
+Do not repeat the exact same element.
+
+Avoid near-identical duplicates.
+
+Use different compositions and decorative arrangements while keeping the entire collection visually cohesive.
+
+
+CUTTING REQUIREMENTS
+
+Every ephemera piece must be clearly separated.
+
+Use subtle pale edges or narrow cutting margins when appropriate.
+
+Keep the silhouette of each individual element easy to understand and cut.
+
+
+TEXT RULES
+
+Avoid random generated words.
+
+Avoid gibberish.
+
+Avoid misspelled text.
+
+Avoid large blocks of fake text.
+
+If decorative typography is used, keep it minimal and historically appropriate.
+
+When readable wording cannot be guaranteed, prefer ornamental marks, numbers, stamps or mostly text-free designs.
+
+
+DO NOT INCLUDE
+
+No modern objects.
+
+No contemporary branding.
+
+No logos.
+
+No watermarks.
+
+No QR codes.
+
+No website addresses.
+
+No hands.
+
+No scissors.
+
+No desk mockups.
+
+No shipping boxes.
+
+No artificial product packaging.
+
+No unnecessary full-page border.
+
+No overlapping cuttable elements.
+
+
+QUALITY
+
+Highly detailed.
+
+Professional commercial-quality composition.
+
+High-resolution appearance.
+
+Sharp printable details.
+
+Print-ready presentation.
+
+300 DPI quality target.
+
+The final collection should look like a professionally designed ${s.era} ${s.theme} vintage ephemera kit ready to print, cut and use.
+        `.trim();
+
+
+        const field =
+          getElement("productPrompt");
+
+        if (field) {
+
+          field.value =
+            prompt;
+        }
+
+
+        updateTotal();
+
+        updatePreview();
+
+        showStatus(
+          "✅ Product prompt generated"
+        );
+      }
+
+
+      /* =========================
+         ETSY IMAGE BASE
+      ========================= */
+
+      function getEtsyBasePrompt() {
+
+        const s =
+          getSettings();
+
+        const total =
+          s.pages * s.elements;
+
+
+        return `
+PRODUCT:
+${s.era} ${s.theme} Vintage Ephemera Printable Collection
+
+ELEMENT TYPE:
+${s.elementType}
+
+ART STYLE:
+${s.style}
+
+COLOR PALETTE:
+${s.palette}
+
+PAPER:
+${s.paper}
+
+NUMBER OF PRINTABLE PAGES:
+${s.pages}
+
+APPROXIMATE TOTAL ELEMENTS:
+${total}
+
+PAGE SIZE:
+${s.page}
+
+DIGITAL FORMAT:
+${s.output}
+
+
+MARKETPLACE PURPOSE
+
+Create a professional Etsy product listing presentation image for this digital printable collection.
+
+Maintain a consistent premium vintage visual identity across all listing images.
+
+The product should always remain the visual focus.
+
+Use elegant composition, tasteful depth and professional marketplace presentation.
+
+
+IMPORTANT
+
+This is a DIGITAL DOWNLOAD.
+
+Do not make the product look like a physical product being shipped.
+
+No shipping boxes.
+
+No mailing envelopes implying physical delivery.
+
+No logos.
+
+No watermarks.
+
+No fake Etsy interface.
+
+No fake ratings.
+
+No fake reviews.
+
+No random generated text.
+
+No misspelled typography.
+
+No misleading product quantity.
+
+No hands covering important product details.
+
+High resolution.
+
+Commercial-quality Etsy marketplace presentation.
+        `.trim();
+      }
+
+
+      /* =========================
+         ETSY IMAGE PROMPTS
+      ========================= */
+
+      function makeEtsyImagePrompt(type) {
+
+        const s =
+          getSettings();
+
+        const total =
+          s.pages * s.elements;
+
+        const base =
+          getEtsyBasePrompt();
+
+
+        const prompts = {
+
+
+          hero: `
+${base}
+
+IMAGE TYPE:
+MAIN ETSY THUMBNAIL
+
+Create the strongest hero image for this product listing.
+
+Show a beautiful selection of the most attractive ${s.theme} ephemera pieces.
+
+Use one or two large hero elements together with smaller supporting pieces.
+
+Use elegant layering.
+
+Add subtle realistic shadows.
+
+Use a clean neutral or softly vintage background.
+
+Immediately communicate the visual style and value of the collection.
+
+The product must remain easy to understand when displayed as a small marketplace thumbnail.
+
+Leave some clean visual space where a short promotional headline could later be added manually.
+
+Do not generate large blocks of text.
+
+The final result should feel premium, collectible and visually irresistible.
+          `,
+
+
+          included: `
+${base}
+
+IMAGE TYPE:
+WHAT'S INCLUDED
+
+Create a clean product contents overview.
+
+Visually communicate that the customer receives:
+
+${s.pages} printable page(s)
+
+approximately ${total} individual ephemera pieces.
+
+Show representative printable sheets together with several individual elements.
+
+Use an organized, easy-to-understand presentation.
+
+The customer should immediately understand the quantity, variety and overall visual style of the collection.
+
+Do not overcrowd the composition.
+          `,
+
+
+          closeup: `
+${base}
+
+IMAGE TYPE:
+CLOSE-UP DETAILS
+
+Create detailed close-up views of several representative pieces.
+
+Highlight:
+
+${s.style} artwork,
+
+${s.palette} color tones,
+
+${s.paper} paper texture,
+
+aged print details,
+
+faded vintage pigments,
+
+fine decorative elements,
+
+natural antique imperfections,
+
+and high-quality illustration detail.
+
+The goal is to show the visual richness and quality of the printable artwork.
+          `,
+
+
+          cutout: `
+${base}
+
+IMAGE TYPE:
+CUT-OUT ELEMENT PREVIEW
+
+Show several individual ${s.elementType.toLowerCase()} pieces separated as if carefully cut from their printable pages.
+
+Arrange them in an elegant flat-lay composition.
+
+Clearly demonstrate that the elements are individually cuttable.
+
+Keep the shapes and outlines easy to understand.
+
+Use subtle shadows to create separation from the background.
+
+Maintain the same ${s.theme}, ${s.palette} and ${s.era} aesthetic.
+          `,
+
+
+          journal: `
+${base}
+
+IMAGE TYPE:
+JUNK JOURNAL USE CASE
+
+Create an elegant junk journal spread using representative pieces from the collection.
+
+Show how the ${s.theme} ephemera could be used inside a vintage journal.
+
+Include subtle layers of paper, journal pages and tasteful craft details.
+
+Keep the ephemera pieces visually dominant.
+
+Do not overcrowd the journal spread.
+
+Create an inspirational but believable craft presentation.
+          `,
+
+
+          collage: `
+${base}
+
+IMAGE TYPE:
+SCRAPBOOK OR COLLAGE USE CASE
+
+Create a beautiful handmade collage using representative ${s.theme} ephemera pieces.
+
+Maintain the ${s.era} period influence.
+
+Maintain the ${s.palette} palette.
+
+Maintain the ${s.style} illustration treatment.
+
+Use tasteful layering and balanced composition.
+
+Create a premium inspirational craft image for Etsy shoppers interested in journaling, collage and scrapbooking.
+          `,
+
+
+          pages: `
+${base}
+
+IMAGE TYPE:
+PRINTABLE PAGE PREVIEW
+
+Show several printable sheets from the collection.
+
+Keep the pages clear, straight and easy to understand.
+
+Show the ${s.elementType} pieces arranged on the printable sheets.
+
+Do not distort the artwork.
+
+Do not crop important elements.
+
+Make it visually obvious that this is a downloadable printable kit containing ${s.pages} page(s).
+
+Use a clean professional presentation.
+          `,
+
+
+          process: `
+${base}
+
+IMAGE TYPE:
+DOWNLOAD · PRINT · CUT · CREATE
+
+Create a simple visual presentation explaining the customer workflow:
+
+1. DOWNLOAD
+
+2. PRINT
+
+3. CUT
+
+4. CREATE
+
+Use four clean visual stages.
+
+Use icons or simple visual storytelling.
+
+Keep text areas short and minimal.
+
+Avoid long generated sentences.
+
+Maintain the same vintage design language as the product listing.
+          `,
+
+
+          digital: `
+${base}
+
+IMAGE TYPE:
+DIGITAL DOWNLOAD INFORMATION
+
+Create a clean informational marketplace image.
+
+Leave structured visual areas where these short phrases can later be added manually:
+
+DIGITAL DOWNLOAD
+
+NO PHYSICAL ITEM
+
+PRINT AT HOME
+
+READY TO PRINT
+
+Use minimal decoration inspired by the ${s.theme} collection.
+
+Keep the layout clear and easy to understand.
+
+Do not generate long paragraphs.
+
+Do not imply physical shipping.
+          `,
+
+
+          beauty: `
+${base}
+
+IMAGE TYPE:
+FINAL BEAUTY SHOT
+
+Create a premium lifestyle-inspired beauty image using the strongest pieces from the ${s.theme} collection.
+
+Use sophisticated layering.
+
+Use rich but subtle vintage paper textures.
+
+Use tasteful depth and realistic soft shadows.
+
+Create an emotional, artistic presentation.
+
+The viewer should imagine using these ephemera pieces in their own junk journals, scrapbooks and collage projects.
+
+The final image should feel elegant, cohesive and premium.
+          `
+
+        };
+
+
+        return prompts[type] || "";
+      }
+
+
+      function generateEtsyImagePrompts() {
+
+        const promptTypes = [
+
+          "hero",
+
+          "included",
+
+          "closeup",
+
+          "cutout",
+
+          "journal",
+
+          "collage",
+
+          "pages",
+
+          "process",
+
+          "digital",
+
+          "beauty"
+
+        ];
+
+
+        promptTypes.forEach(function (type, index) {
+
+          const field =
+            getElement(
+              "etsyImage" + (index + 1)
+            );
+
+          if (field) {
+
+            field.value =
+              makeEtsyImagePrompt(type).trim();
+          }
+
+        });
+      }
+
+
+      /* =========================
+         ETSY TEXT PROMPTS
+      ========================= */
+
+      function generateEtsyTextPrompts() {
+
+        const s =
+          getSettings();
+
+        const total =
+          s.pages * s.elements;
+
+
+        const titlePrompt = `
+Act as an experienced Etsy SEO copywriter specializing in digital printables, junk journals, scrapbooking and vintage ephemera.
+
+Create 10 strong Etsy product title options for this product:
+
+${s.era} ${s.theme} Vintage Ephemera Printable Collection
+
+PRODUCT DETAILS
+
+Element Type:
+${s.elementType}
+
+Art Style:
+${s.style}
+
+Color Palette:
+${s.palette}
+
+Number of Pages:
+${s.pages}
+
+Approximate Total Elements:
+${total}
+
+Page Size:
+${s.page}
+
+File Format:
+${s.output}
+
+Product Type:
+Digital Download
+
+
+TARGET BUYERS
+
+Junk journal creators
+
+Scrapbookers
+
+Art journal creators
+
+Collage artists
+
+Paper crafters
+
+Vintage printable enthusiasts
+
+
+SEO DIRECTION
+
+Use natural buyer-focused search phrases where relevant, including concepts such as:
+
+vintage ephemera
+
+printable ephemera
+
+junk journal printable
+
+digital download
+
+journal supplies
+
+scrapbooking printable
+
+${s.theme.toLowerCase()} printable
+
+${s.elementType.toLowerCase()}
+
+
+RULES
+
+Avoid awkward keyword stuffing.
+
+Avoid repeating the same keyword excessively.
+
+Do not invent product features.
+
+Make it clear that the product is a digital printable.
+
+Keep titles readable and attractive to human shoppers.
+
+
+AFTER GENERATING THE 10 TITLES
+
+1. Select the strongest title.
+
+2. Briefly explain why it is strongest.
+
+3. Create one shorter alternative title.
+
+4. Identify the primary keyword used in the winning title.
+        `.trim();
+
+
+        const descriptionPrompt = `
+Act as a professional Etsy copywriter specializing in digital printable products, junk journals and vintage ephemera.
+
+Write a complete Etsy listing description for:
+
+${s.era} ${s.theme} Vintage Ephemera Printable Collection
+
+
+PRODUCT DETAILS
+
+Element Type:
+${s.elementType}
+
+Artwork:
+${s.style}
+
+Color Palette:
+${s.palette}
+
+Paper Appearance:
+${s.paper}
+
+Number of Pages:
+${s.pages}
+
+Elements per Page:
+Approximately ${s.elements}
+
+Approximate Total Elements:
+${total}
+
+Page Size:
+${s.page}
+
+Orientation:
+${s.orientation}
+
+File Format:
+${s.output}
+
+Product Type:
+Digital Download
+
+
+IMPORTANT
+
+No physical item will be shipped.
+
+
+TARGET CUSTOMERS
+
+Junk journal creators
+
+Scrapbookers
+
+Journal makers
+
+Collage artists
+
+Paper crafters
+
+Vintage craft enthusiasts
+
+
+WRITE THE DESCRIPTION USING THIS STRUCTURE
+
+
+1. OPENING
+
+Write an attractive 2–3 sentence introduction describing the mood, theme and creative possibilities of the collection.
+
+
+2. WHAT YOU WILL RECEIVE
+
+Clearly mention:
+
+${s.pages} printable page(s)
+
+approximately ${total} individual ephemera pieces
+
+${s.page} page size
+
+${s.output} format
+
+digital download
+
+
+3. DESIGN DETAILS
+
+Describe the:
+
+${s.era} inspiration
+
+${s.theme} theme
+
+${s.style} artwork
+
+${s.palette} palette
+
+${s.paper} paper appearance
+
+
+4. PERFECT FOR
+
+Include relevant uses such as:
+
+junk journals
+
+scrapbooking
+
+art journals
+
+collage
+
+journal cards
+
+tags
+
+pockets
+
+decorative clusters
+
+paper crafts
+
+creative printable projects
+
+
+5. HOW TO USE
+
+Explain simply that customers can download, print, cut and use the elements in creative projects.
+
+
+6. PRINTING SUGGESTIONS
+
+Give short practical printing suggestions.
+
+Mention suitable paper options such as:
+
+matte paper
+
+presentation paper
+
+light cardstock when appropriate
+
+
+7. DIGITAL DOWNLOAD NOTICE
+
+Clearly state:
+
+This is a digital product.
+
+No physical item will be shipped.
+
+Colors may vary depending on screen, printer, ink and paper.
+
+The customer needs a printer or printing service.
+
+
+8. IMPORTANT NOTES
+
+Explain that resizing files may affect print quality.
+
+Remind the buyer to review the product details before purchase.
+
+
+9. CLOSING
+
+Finish with a short warm paragraph encouraging creative use of the collection.
+
+
+SEO
+
+Naturally use relevant phrases such as:
+
+vintage ephemera printable
+
+junk journal printable
+
+digital download
+
+scrapbooking ephemera
+
+printable journal supplies
+
+Do not keyword-stuff.
+
+
+WRITING STYLE
+
+Warm.
+
+Professional.
+
+Creative.
+
+Clear.
+
+Easy to scan.
+
+Do not use exaggerated promises.
+
+Do not invent features that are not provided.
+
+
+FINALLY
+
+Create a second, shorter mobile-friendly version of the description.
+        `.trim();
+
+
+        const tagsPrompt = `
+Act as an Etsy SEO specialist.
+
+Generate exactly 13 Etsy tags for this product:
+
+${s.era} ${s.theme} Vintage Ephemera Printable Collection
+
+Element Type:
+${s.elementType}
+
+Art Style:
+${s.style}
+
+Color Palette:
+${s.palette}
+
+Product Type:
+Digital Printable
+
+
+TARGET BUYERS
+
+Junk journal creators
+
+Scrapbookers
+
+Journal makers
+
+Collage artists
+
+Paper crafters
+
+
+TAG STRATEGY
+
+Focus on strong buyer intent.
+
+Use relevant long-tail phrases where useful.
+
+Include theme-specific keywords connected to ${s.theme}.
+
+Avoid irrelevant terms.
+
+Avoid excessive repetition.
+
+Do not include misleading keywords.
+
+Return exactly 13 strong Etsy tags.
+
+Then identify:
+
+Primary keyword
+
+3 strongest long-tail keywords
+
+3 niche-specific keywords
+        `.trim();
+
+
+        const altPrompt = `
+Create accessible and SEO-friendly Etsy image alt text for 10 product listing images.
+
+PRODUCT
+
+${s.era} ${s.theme} Vintage Ephemera Printable Collection
+
+Element Type:
+${s.elementType}
+
+Art Style:
+${s.style}
+
+Palette:
+${s.palette}
+
+
+CREATE ALT TEXT FOR
+
+1. Main Etsy product thumbnail
+
+2. What's included overview
+
+3. Close-up details
+
+4. Cut-out elements
+
+5. Junk journal use case
+
+6. Scrapbook or collage use case
+
+7. Printable page preview
+
+8. Download, print, cut and create process
+
+9. Digital download information image
+
+10. Final beauty image
+
+
+RULES
+
+Write one concise natural sentence per image.
+
+Describe what is actually visible.
+
+Keep the wording useful for accessibility.
+
+Use product-related keywords naturally.
+
+Avoid keyword stuffing.
+
+Do not use hashtags.
+
+Do not repeat the exact same sentence structure.
+
+Number the final results 1 through 10.
+        `.trim();
+
+
+        const materialsPrompt = `
+Act as an Etsy listing specialist.
+
+Create an appropriate Materials / Attributes suggestion list for this DIGITAL printable product:
+
+${s.era} ${s.theme} Vintage Ephemera Collection
+
+Element Type:
+${s.elementType}
+
+Artwork:
+${s.style}
+
+File Format:
+${s.output}
+
+Page Size:
+${s.page}
+
+Orientation:
+${s.orientation}
+
+
+IMPORTANT
+
+This is a digital download.
+
+Do not imply that physical paper, scissors, ink, envelopes or craft materials are included.
+
+Do not suggest physical shipping.
+
+Only suggest relevant digital file attributes, printable-product descriptors and listing metadata.
+
+Return a concise practical list.
+        `.trim();
+
+
+        const seoPrompt = `
+Act as an Etsy SEO strategist specializing in junk journal printables, vintage ephemera and digital downloads.
+
+Analyze this product:
+
+${s.era} ${s.theme} Vintage Ephemera Printable Collection
+
+Element Type:
+${s.elementType}
+
+Art Style:
+${s.style}
+
+Palette:
+${s.palette}
+
+Paper Style:
+${s.paper}
+
+Pages:
+${s.pages}
+
+Approximate Total Elements:
+${total}
+
+Page Size:
+${s.page}
+
+File Format:
+${s.output}
+
+
+CREATE A COMPLETE ETSY SEO PACKAGE CONTAINING
+
+1. Primary keyword
+
+2. Secondary keywords
+
+3. Long-tail buyer keywords
+
+4. Exactly 13 Etsy tags
+
+5. Recommended Etsy title structure
+
+6. Suggested optimized title
+
+7. Suggested opening 160 characters for the description
+
+8. Image alt-text keyword strategy
+
+9. High-intent buyer search phrases
+
+10. Related niche keywords
+
+11. Theme-specific keywords for ${s.theme}
+
+12. Product-type keywords for ${s.elementType}
+
+13. Keywords to avoid because they are misleading or irrelevant
+
+
+STRATEGY
+
+Prioritize buyer intent.
+
+Use natural language.
+
+Avoid keyword stuffing.
+
+Avoid excessive repetition.
+
+Do not invent product features.
+
+Keep all recommendations relevant to a digital printable ephemera product.
+        `.trim();
+
+
+        const promptMap = {
+
+          titlePrompt:
+            titlePrompt,
+
+          descriptionPrompt:
+            descriptionPrompt,
+
+          tagsPrompt:
+            tagsPrompt,
+
+          altPrompt:
+            altPrompt,
+
+          materialsPrompt:
+            materialsPrompt,
+
+          seoPrompt:
+            seoPrompt
+
+        };
+
+
+        Object.keys(promptMap).forEach(function (id) {
+
+          const field =
+            getElement(id);
+
+          if (field) {
+
+            field.value =
+              promptMap[id];
+          }
+
+        });
+      }
+
+
+      /* =========================
+         COMPLETE ETSY KIT
+      ========================= */
+
+      function generateCompleteEtsyKit() {
+
+        generateEtsyImagePrompts();
+
+        generateEtsyTextPrompts();
+
+        updatePreview();
+
+        updateTotal();
+
+        showStatus(
+          "🛍️ Complete Etsy kit generated"
+        );
+      }
+
+
+      /* =========================
+         COPY
+      ========================= */
+
+      async function copyField(id) {
+
+        const field =
+          getElement(id);
+
+        if (
+          !field ||
+          !field.value.trim()
+        ) {
+
+          showStatus(
+            "⚠️ Generate a prompt first"
+          );
+
+          return;
+        }
+
+
+        try {
+
+          await navigator.clipboard.writeText(
+            field.value
+          );
+
+          showStatus(
+            "✅ Prompt copied"
+          );
+
+        } catch (error) {
+
+          field.focus();
+
+          field.select();
+
+          document.execCommand(
+            "copy"
+          );
+
+          showStatus(
+            "✅ Prompt copied"
+          );
+        }
+      }
+
+
+      /* =========================
+         RANDOM
+      ========================= */
+
+      function randomizeSelect(id) {
+
+        const select =
+          getElement(id);
+
+        if (
+          !select ||
+          !select.options ||
+          !select.options.length
+        ) {
+
+          return;
+        }
+
+
+        select.selectedIndex =
+          Math.floor(
+            Math.random() *
+            select.options.length
+          );
+      }
+
+
+      function randomizeSettings() {
+
+        [
+
+          "era",
+
+          "theme",
+
+          "elementType",
+
+          "style",
+
+          "palette",
+
+          "paper"
+
+        ].forEach(
+          randomizeSelect
+        );
+
+
+        updateTotal();
+
+        generateProductPrompt();
+
+        generateCompleteEtsyKit();
+
+        showStatus(
+          "🎲 Random collection generated"
+        );
+      }
+
+
+      /* =========================
+         RESET
+      ========================= */
+
+      function resetApp() {
+
+        document
+          .querySelectorAll("textarea")
+          .forEach(function (textarea) {
+
+            textarea.value = "";
+
+          });
+
+
+        getElement("era").selectedIndex = 0;
+
+        getElement("theme").selectedIndex = 0;
+
+        getElement("elementType").selectedIndex = 0;
+
+        getElement("style").selectedIndex = 0;
+
+        getElement("palette").selectedIndex = 0;
+
+        getElement("paper").selectedIndex = 0;
+
+        getElement("page").selectedIndex = 0;
+
+        getElement("orientation").selectedIndex = 0;
+
+        getElement("output").selectedIndex = 0;
+
+
+        getElement("pages").value = 4;
+
+        getElement("elements").value = 8;
+
+
+        const preview =
+          getElement("preview");
+
+
+        preview.classList.remove(
+          "ready"
+        );
+
+
+        preview.innerHTML = `
+          <div>
+            🖼️
+            <br /><br />
+            Your Product Preview
+          </div>
+        `;
+
+
+        updateTotal();
+
+
+        showStatus(
+          "↺ Settings reset"
+        );
+      }
+
+
+      /* =========================
+         BUTTON EVENTS
+      ========================= */
+
+      getElement(
+        "generateProductButton"
+      ).addEventListener(
+        "click",
+        generateProductPrompt
+      );
+
+
+      getElement(
+        "generateEtsyButton"
+      ).addEventListener(
+        "click",
+        generateCompleteEtsyKit
+      );
+
+
+      getElement(
+        "randomButton"
+      ).addEventListener(
+        "click",
+        randomizeSettings
+      );
+
+
+      getElement(
+        "resetButton"
+      ).addEventListener(
+        "click",
+        resetApp
+      );
+
+
+      /* =========================
+         COPY BUTTON EVENTS
+      ========================= */
+
+      document
+        .querySelectorAll("[data-copy]")
+        .forEach(function (button) {
+
+          button.addEventListener(
+            "click",
+            function () {
+
+              const target =
+                button.getAttribute(
+                  "data-copy"
+                );
+
+              copyField(target);
+
+            }
+          );
+
+        });
+
+
+      /* =========================
+         INPUT EVENTS
+      ========================= */
+
+      getElement(
+        "pages"
+      ).addEventListener(
+        "input",
+        updateTotal
+      );
+
+
+      getElement(
+        "elements"
+      ).addEventListener(
+        "input",
+        updateTotal
+      );
+
+
+      /* =========================
+         INITIAL
+      ========================= */
+
+      updateTotal();
+
+    });
+  </script>
+
+</body>
+
+</html>
